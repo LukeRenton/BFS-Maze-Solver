@@ -13,6 +13,8 @@ void populate_maze(vector<vector<char>> &maze, int rows, int cols, int &start_ro
 		vector<char> row;
 		for (int j=0;j<cols;j++){
 			row.push_back(line[j]);
+			
+			//Capture start and goal positions
 			if(line[j] == 'S'){
 				start_row = i;
 				start_col = j;
@@ -59,29 +61,29 @@ void dfs(vector<vector<char>> &maze, int rows, int cols, int start_row, int star
 	
 	tiles[start_row][start_col] = 0;
 	while (locations.empty() != true && (not (locations.front().first == goal_row && locations.front().second == goal_col))){
-		//do somewthing
 		current = locations.front();
 		locations.pop();
-		for (auto couple: direction){
-			int x = current.first + couple.first, y = current.second + couple.second;
-			//cout << "X co-ord: " << x << endl << "Y co-ord: " << y << endl;
-			if (maze[x][y] != 'x' && tiles[x][y] == -1 && (x>0 && x < rows) && (y>0 && y < cols)){			
+		for (auto couple: direction){			
+			int x = current.first + couple.first, y = current.second + couple.second; //move to the next cell going DLUR
+			if (maze[x][y] != 'x' && tiles[x][y] == -1 && (x>0 && x < rows) && (y>0 && y < cols)){ //make sure its not been vistied/within bounds		
 				tiles[x][y] = 0;
 				parent[x][y] = current;
 				locations.push(make_pair(x,y));			
 			}
 		}		
 	}
-	if (locations.empty() == true){
+	
+	if (locations.empty() == true){ //Not solvable
 		cout << "No Path" << endl;
 	}
 	else{
 		current = {goal_row, goal_col};
+		//Backtrack to the start writing the path
 		while (not(current.first == start_row && current.second == start_col)){
 			current = parent[current.first][current.second];
 			maze[current.first][current.second] = '*';
 		}
-		maze[start_row][start_col] = 'S';
+		maze[start_row][start_col] = 'S'; //To prevent the start from being replaced by a star
 		display_maze(maze, rows, cols);
 	}
 	
